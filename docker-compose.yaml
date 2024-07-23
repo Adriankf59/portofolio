@@ -1,0 +1,32 @@
+version: "3"
+services:
+  directus:
+    image: directus/directus:10.13.1
+    volumes:
+      - ./directus/uploads:/directus/uploads
+      - ./directus/extensions:/directus/extensions
+    environment:
+      PUBLIC_URL: "/panel"
+      SECRET: "replace-with-secure-random-value"
+      ADMIN_EMAIL: "admin@example.com"
+      ADMIN_PASSWORD: "adminadmin"
+      DB_CLIENT: "pg"
+      DB_HOST: "host.docker.internal"
+      DB_PORT: 5432
+      DB_DATABASE: portofolio
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+  next:
+    build:
+      context: nextjs
+    restart: unless-stopped
+  nginx:
+    image: nginx:1-alpine
+    ports:
+      - "80:80"
+    depends_on:
+      - directus
+      - next
+    volumes:
+      - "./nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
+    restart: unless-stopped
